@@ -7,23 +7,27 @@ import "../contracts/facets/DiamondLoupeFacet.sol";
 import "../contracts/facets/OwnershipFacet.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
-import "../contracts/facets/ERC721facet.sol";
+import "../contracts/facets/Marketplacefacet.sol";
+
 
 contract DiamondDeployer is Test, IDiamondCut {
     //contract types of facets to be deployed
     Diamond diamond;
     DiamondCutFacet dCutFacet;
     DiamondLoupeFacet dLoupe;
-    OwnershipFacet ownerF;
-    ERC721Facet erc721Facet;
+    OwnershipFacet ownerF; 
+    Marketplacefacet marketplacefacet;
+
+    
 
     function testDeployDiamond() public {
         //deploy facets
         dCutFacet = new DiamondCutFacet();
-       // diamond = new Diamond(address(this), address(dCutFacet));
+        //diamond = new Diamond(address(this), address(dCutFacet));
         dLoupe = new DiamondLoupeFacet();
         ownerF = new OwnershipFacet();
-        erc721Facet = new  ERC721Facet();
+        marketplacefacet = new Marketplacefacet();
+        
 
         //upgrade diamond with facets
 
@@ -38,18 +42,19 @@ contract DiamondDeployer is Test, IDiamondCut {
             })
         );
 
+        
         cut[1] = (
-            FacetCut({
-                facetAddress: address(erc721Facet),
-                action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("ERC721Facet")
-            })
-        );
-        cut[2] = (
             FacetCut({
                 facetAddress: address(ownerF),
                 action: FacetCutAction.Add,
                 functionSelectors: generateSelectors("OwnershipFacet")
+            })
+        );
+        cut[2] = (
+            FacetCut({
+                facetAddress: address(marketplacefacet),
+                action: FacetCutAction.Add,
+                functionSelectors: generateSelectors("Marketplacefacet")
             })
         );
 
@@ -76,14 +81,4 @@ contract DiamondDeployer is Test, IDiamondCut {
         address _init,
         bytes calldata _calldata
     ) external override {}
-    //  function test_createListing() public {
-    //     l.lister = Fuser1;
-    //     switchSigner(Fuser2);
-
-    //     vm.expectRevert("You are not the owner of this token");
-    //     marketplace.createListing();
-
-    // }
-
-
 }

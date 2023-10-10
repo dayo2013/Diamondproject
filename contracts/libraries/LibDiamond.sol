@@ -6,7 +6,16 @@ pragma solidity ^0.8.0;
 * EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
 /******************************************************************************/
 import {IDiamondCut} from "../interfaces/IDiamondCut.sol";
+struct Addlisting{
+        address token;
+        uint256 tokenId;
+        uint256 price;
+        bytes sig;
+        uint88 deadline;
+        address lister;
+        bool active;
 
+    }
 library LibDiamond {
     error InValidFacetCutAction();
     error NotDiamondOwner();
@@ -23,6 +32,10 @@ library LibDiamond {
     error InitCallFailed();
     bytes32 constant DIAMOND_STORAGE_POSITION =
         keccak256("diamond.standard.diamond.storage");
+
+    
+    
+    
 
     struct FacetAddressAndPosition {
         address facetAddress;
@@ -47,8 +60,26 @@ library LibDiamond {
         mapping(bytes4 => bool) supportedInterfaces;
         // owner of the contract
         address contractOwner;
-    }
 
+         string  _name;
+
+    // Token symbol
+    string  _symbol;
+
+    mapping(uint256 tokenId => address)  _owners;
+
+    mapping(address owner => uint256)  _balances;
+
+    mapping(uint256 tokenId => address)  _tokenApprovals;
+
+    mapping(address owner => mapping(address operator => bool))  _operatorApprovals;
+    mapping(uint256 => Addlisting) listings;
+    address admin;
+    uint256 listingId;
+    
+
+    }
+    
     function diamondStorage()
         internal
         pure
@@ -64,6 +95,19 @@ library LibDiamond {
         address indexed previousOwner,
         address indexed newOwner
     );
+
+    function setERC721details(string memory name_, string memory symbol_) internal {
+        DiamondStorage storage ds = diamondStorage();
+        ds._name = name_;
+        ds._symbol = symbol_;
+
+    }
+function setMarketplace(uint256 marketplace_) internal {
+        DiamondStorage storage ds = diamondStorage();
+        ds.listingId = marketplace_;
+        ds.admin = msg.sender;
+        
+    }
 
     function setContractOwner(address _newOwner) internal {
         DiamondStorage storage ds = diamondStorage();
